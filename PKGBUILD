@@ -1,7 +1,7 @@
 # Maintainer: Jonas Riedel <jonasriedel@pm.me>
 
 pkgname=rusty-ls
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
 pkgdesc="A replacement of the ls command"
 arch=('x86_64')
