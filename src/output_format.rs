@@ -32,6 +32,35 @@ fn format_name(entry: &fs::DirEntry) -> String {
     }
 }
 
+pub fn print_normal_format_grouped(entries: Vec<fs::DirEntry>) -> Result<()> {
+    let num_columns = 5;
+    let column_spacing = 2; // Adjust this value for spacing between columns
+
+    if entries.is_empty() {
+        return Ok(());
+    }
+
+    let max_filename_length = entries.iter()
+        .map(|entry| format_name(entry).len())
+        .max()
+        .unwrap_or(0);
+
+    for (i, entry) in entries.iter().enumerate() {
+        let filename = format_name(entry);
+        print!("{:<width$}", filename, width = max_filename_length + column_spacing);
+
+        if (i + 1) % num_columns == 0 {
+            println!(); // Move to the next line after each row
+        }
+    }
+
+    if entries.len() % num_columns != 0 {
+        println!();
+    }
+
+    Ok(())
+}
+
 pub fn colorize_string(text: &str, color: &str) -> String {
     format!("{}{}{}", color, text, "\x1B[0m")
 }

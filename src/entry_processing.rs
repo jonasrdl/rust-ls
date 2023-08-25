@@ -6,7 +6,7 @@ use std::ffi::CStr;
 use libc;
 use std::os::unix::fs::PermissionsExt;
 
-use crate::{output_format};
+use crate::output_format;
 
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -32,7 +32,12 @@ pub fn list_files(path: &PathBuf, all: bool, long: bool) -> Result<()> {
             print_long_format(&entry)?;
         }
     } else {
-        output_format::print_normal_format(filtered_entries)?;
+        let threshold = 20;
+        if filtered_entries.len() > threshold {
+            output_format::print_normal_format_grouped(filtered_entries)?;
+        } else {
+            output_format::print_normal_format(filtered_entries)?;
+        }
     }
 
     Ok(())
