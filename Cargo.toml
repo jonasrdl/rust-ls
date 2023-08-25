@@ -1,5 +1,5 @@
 [package]
-name = "rust-ls"
+name = "rusty-ls"
 version = "0.1.0"
 edition = "2021"
 description = "A replacement for the ls command"
