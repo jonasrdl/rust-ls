@@ -12,8 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Log in to crates.io
+        run: cargo login ${{ secrets.CRATES_IO_TOKEN }}
+
       - name: Publish to crates.io
         run: cargo publish
         env:
           CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
