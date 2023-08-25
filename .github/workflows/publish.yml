@@ -15,6 +15,7 @@ jobs:
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
+          toolchain: nightly
           profile: minimal
 
       - name: Publish to crates.io
