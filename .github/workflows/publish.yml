@@ -19,6 +19,7 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
+          default: true
 
       - run: cargo publish --token ${CRATES_IO_TOKEN}
         env:
