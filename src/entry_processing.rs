@@ -6,7 +6,7 @@ use std::ffi::CStr;
 use libc;
 use std::os::unix::fs::PermissionsExt;
 
-use crate::output_format;
+use crate::{output_format};
 
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -38,7 +38,7 @@ pub fn list_files(path: &PathBuf, all: bool, long: bool) -> Result<()> {
     Ok(())
 }
 
-fn print_long_format(entry: &fs::DirEntry) -> Result<()> {
+pub fn print_long_format(entry: &fs::DirEntry) -> Result<()> {
     let metadata = entry.metadata()?;
     let file_name = entry.file_name();
     let file_name_str = file_name.to_string_lossy();
@@ -52,13 +52,21 @@ fn print_long_format(entry: &fs::DirEntry) -> Result<()> {
 
     let file_type = if metadata.is_dir() {
         output_format::colorize_string(&file_name_str, "\x1B[34m")
+    } else if metadata.permissions().mode() & 0o111 != 0 {
+        output_format::colorize_string(&output_format::bold(&file_name_str), "\x1B[32;1m") // Green and bold
     } else {
         file_name_str.to_string()
     };
 
+    let symlink_target = if is_symlink(entry) {
+        format!(" -> {}", get_symlink_target(entry).unwrap_or_default())
+    } else {
+        "".to_string()
+    };
+
     println!(
-        "{:<10} {:<8} {:<8} {:<10} {:<15} {}",
-        permission, owner, group, size, formatted_mod_time, file_type
+        "{:<10} {:<8} {:<8} {:<10} {:<15} {}{}",
+        permission, owner, group, size, formatted_mod_time, file_type, symlink_target
     );
 
     Ok(())
@@ -118,4 +126,20 @@ fn format_permissions(mode: u32) -> String {
     }
 
     permission_string
+}
+
+pub fn is_symlink(entry: &fs::DirEntry) -> bool {
+    if let Ok(metadata) = entry.metadata() {
+        metadata.file_type().is_symlink()
+    } else {
+        false
+    }
+}
+
+pub fn get_symlink_target(entry: &fs::DirEntry) -> Option<String> {
+    if let Ok(target_path) = entry.path().read_link() {
+        Some(target_path.to_string_lossy().to_string())
+    } else {
+        None
+    }
 }
